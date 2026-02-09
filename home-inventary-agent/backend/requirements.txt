@@ -1,0 +1,48 @@
+fastapi
+uvicorn[standard]
+
+# Database
+sqlalchemy>=2.0
+asyncpg
+alembic
+
+# Redis
+redis
+
+# Pydantic
+pydantic>=2.0
+pydantic-settings
+
+# Google ADK
+google-adk
+google-generativeai
+
+# Google Cloud (Voice)
+google-cloud-speech
+google-cloud-texttospeech
+
+# File Processing
+pandas
+openpyxl
+
+# Notifications
+twilio
+
+# Email (SMTP fallback)
+aiosmtplib
+
+# Environment
+python-dotenv
+
+# Logging
+structlog
+
+# HTTP Client (if needed internally)
+httpx
+
+# Security utils
+python-multipart
+
+# Optional (recommended for production)
+orjson
+python-dotenv
