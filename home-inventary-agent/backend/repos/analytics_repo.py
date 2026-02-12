@@ -1,15 +1,13 @@
 # backend/repos/analytics_repo.py
 
-from sqlalchemy import select, func, desc, and_
+from sqlalchemy import select, func, desc, asc, and_
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime, date, timedelta
-from typing import List, Optional, Dict
-from uuid import UUID
+from datetime import date, timedelta
+from typing import List, Dict
 
 from models.schema import (
     StockMovement,
     InventoryBatch,
-    Item,
     TimeSeriesSales,
     MovementType,
 )
@@ -17,9 +15,9 @@ from models.schema import (
 
 class AnalyticsRepo:
 
-    # -----------------------------------
-    # TOTAL SOLD TODAY
-    # -----------------------------------
+    # ============================================================
+    # TOTAL SOLD TODAY (QUANTITY)
+    # ============================================================
     async def get_total_sold_today(
         self,
         db: AsyncSession
@@ -40,10 +38,29 @@ class AnalyticsRepo:
 
         return float(result.scalar() or 0)
 
+    # ============================================================
+    # TOTAL REVENUE TODAY (NEW)
+    # ============================================================
+    async def get_total_revenue_today(
+        self,
+        db: AsyncSession
+    ) -> float:
 
-    # -----------------------------------
+        today = date.today()
+
+        result = await db.execute(
+            select(
+                func.coalesce(func.sum(TimeSeriesSales.qty_sold), 0)
+            ).where(
+                TimeSeriesSales.date == today
+            )
+        )
+
+        return float(result.scalar() or 0)
+
+    # ============================================================
     # TOP SELLING ITEMS TODAY
-    # -----------------------------------
+    # ============================================================
     async def get_top_selling_items_today(
         self,
         db: AsyncSession,
@@ -64,7 +81,7 @@ class AnalyticsRepo:
                 )
             )
             .group_by(StockMovement.item_id)
-            .order_by(desc("total_sold"))
+            .order_by(desc(func.sum(StockMovement.quantity)))
             .limit(limit)
         )
 
@@ -75,10 +92,9 @@ class AnalyticsRepo:
             for r in rows
         ]
 
-
-    # -----------------------------------
-    # LEAST SELLING ITEMS TODAY
-    # -----------------------------------
+    # ============================================================
+    # LEAST SELLING ITEMS TODAY (FIXED ORDERING)
+    # ============================================================
     async def get_least_selling_items_today(
         self,
         db: AsyncSession,
@@ -99,7 +115,7 @@ class AnalyticsRepo:
                 )
             )
             .group_by(StockMovement.item_id)
-            .order_by("total_sold")
+            .order_by(asc(func.sum(StockMovement.quantity)))
             .limit(limit)
         )
 
@@ -110,10 +126,9 @@ class AnalyticsRepo:
             for r in rows
         ]
 
-
-    # -----------------------------------
+    # ============================================================
     # EXPIRING SOON
-    # -----------------------------------
+    # ============================================================
     async def get_items_expiring_within(
         self,
         db: AsyncSession,
@@ -137,10 +152,9 @@ class AnalyticsRepo:
 
         return result.scalars().all()
 
-
-    # -----------------------------------
+    # ============================================================
     # TOTAL AVAILABLE STOCK PER ITEM
-    # -----------------------------------
+    # ============================================================
     async def get_total_stock_per_item(
         self,
         db: AsyncSession
@@ -149,7 +163,9 @@ class AnalyticsRepo:
         result = await db.execute(
             select(
                 InventoryBatch.item_id,
-                func.coalesce(func.sum(InventoryBatch.quantity_available), 0).label("total_stock")
+                func.coalesce(
+                    func.sum(InventoryBatch.quantity_available), 0
+                ).label("total_stock")
             )
             .group_by(InventoryBatch.item_id)
         )
@@ -161,14 +177,38 @@ class AnalyticsRepo:
             for r in rows
         ]
 
+    # ============================================================
+    # DEAD STOCK (NO MOVEMENT IN N DAYS)
+    # ============================================================
+    async def get_dead_stock(
+        self,
+        db: AsyncSession,
+        days: int = 30
+    ) -> List[int]:
 
-    # -----------------------------------
-    # ML: DAILY SALES HISTORY
-    # -----------------------------------
+        cutoff = date.today() - timedelta(days=days)
+
+        result = await db.execute(
+            select(InventoryBatch.item_id)
+            .where(
+                InventoryBatch.item_id.notin_(
+                    select(StockMovement.item_id).where(
+                        StockMovement.created_at >= cutoff
+                    )
+                )
+            )
+            .distinct()
+        )
+
+        return [row.item_id for row in result.all()]
+
+    # ============================================================
+    # DAILY SALES HISTORY (ML READY)
+    # ============================================================
     async def get_daily_sales_history(
         self,
         db: AsyncSession,
-        item_id: UUID,
+        item_id: int,
         days: int = 30
     ) -> List[TimeSeriesSales]:
 

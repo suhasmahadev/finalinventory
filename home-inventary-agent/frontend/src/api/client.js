@@ -12,7 +12,11 @@ apiClient.interceptors.response.use(
     (error) => {
         const errorMsg = error.response?.data?.detail || error.message || 'Unknown API Error';
         console.error('API Error:', errorMsg);
-        return Promise.reject(error);
+        return Promise.reject({
+            message: errorMsg,
+            status: error.response?.status || 500,
+            detail: error.response?.data
+        });
     }
 );
 

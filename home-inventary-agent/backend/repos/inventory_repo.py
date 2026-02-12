@@ -8,7 +8,6 @@ from models.schema import (
     InventoryBatch,
     Category,
 )
-from uuid import UUID
 from typing import Optional, List
 from datetime import date
 
@@ -24,7 +23,7 @@ class InventoryRepo:
         db: AsyncSession,
         name: str,
         sku: Optional[str],
-        category_id: Optional[UUID],
+        category_id: Optional[int],
         unit: Optional[str],
         reorder_threshold: Optional[float],
         lead_time_days: Optional[int],
@@ -46,7 +45,7 @@ class InventoryRepo:
     async def get_item_by_id(
         self,
         db: AsyncSession,
-        item_id: UUID
+        item_id: int
     ) -> Optional[Item]:
 
         result = await db.execute(
@@ -82,9 +81,9 @@ class InventoryRepo:
     async def create_batch(
         self,
         db: AsyncSession,
-        item_id: UUID,
-        room_id: Optional[UUID],
-        warehouse_id: Optional[UUID],
+        item_id: int,
+        room_id: Optional[int],
+        warehouse_id: Optional[int],
         batch_number: Optional[str],
         quantity: float,
         expiry_date: Optional[date],
@@ -109,7 +108,7 @@ class InventoryRepo:
     async def get_available_batches_fifo(
         self,
         db: AsyncSession,
-        item_id: UUID,
+        item_id: int,
     ) -> List[InventoryBatch]:
 
         result = await db.execute(
@@ -129,7 +128,7 @@ class InventoryRepo:
     async def update_batch_quantity(
         self,
         db: AsyncSession,
-        batch_id: UUID,
+        batch_id: int,
         new_quantity: float
     ) -> None:
 
@@ -146,7 +145,7 @@ class InventoryRepo:
     async def get_total_available_quantity(
         self,
         db: AsyncSession,
-        item_id: UUID
+        item_id: int
     ) -> float:
 
         result = await db.execute(
@@ -182,7 +181,7 @@ class InventoryRepo:
     async def get_items_by_ids(
         self,
         db: AsyncSession,
-        item_ids: List[UUID]
+        item_ids: List[int]
     ) -> List[Item]:
 
         if not item_ids:

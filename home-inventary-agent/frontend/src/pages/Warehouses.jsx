@@ -7,13 +7,20 @@ const Warehouses = () => {
     const [warehouses, setWarehouses] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [newWarehouse, setNewWarehouse] = useState({ name: '', address: '' });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const fetchWarehouses = async () => {
         try {
+            setLoading(true);
+            setError(null);
             const data = await warehouseApi.getWarehouses();
             setWarehouses(data);
         } catch (e) {
             console.error(e);
+            setError(e.message || "Failed to load warehouses");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -22,9 +29,14 @@ const Warehouses = () => {
     }, []);
 
     const handleCreate = async () => {
-        await warehouseApi.createWarehouse(newWarehouse);
-        setModalOpen(false);
-        fetchWarehouses();
+        try {
+            await warehouseApi.createWarehouse(newWarehouse);
+            setModalOpen(false);
+            setNewWarehouse({ name: '', address: '' });
+            fetchWarehouses();
+        } catch (err) {
+            alert(err.message || "Failed to create warehouse");
+        }
     };
 
     const columns = [
@@ -42,10 +54,20 @@ const Warehouses = () => {
                 </button>
             </div>
 
-            <DataTable
-                columns={columns}
-                data={warehouses}
-            />
+            {error && (
+                <div style={{ padding: '1rem', background: 'var(--danger-color)', borderRadius: '4px' }}>
+                    {error}
+                </div>
+            )}
+
+            {loading ? (
+                <div style={{ textAlign: 'center', padding: '2rem' }}>Loading warehouses...</div>
+            ) : (
+                <DataTable
+                    columns={columns}
+                    data={warehouses}
+                />
+            )}
 
             <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Add Warehouse">
                 <div className="flex flex-col gap-4">

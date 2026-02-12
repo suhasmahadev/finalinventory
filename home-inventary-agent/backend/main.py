@@ -6,7 +6,10 @@ from fastapi.staticfiles import StaticFiles
 
 from google.adk.cli.fast_api import get_fast_api_app
 
-from routers import analytics,inventory,health,warehouse
+from routers import analytics,inventory,health,warehouse,voice_router,billing,movement
+
+
+
 
 
 # ---------------------------------------------------------
@@ -57,6 +60,10 @@ app.include_router(inventory.router)
 app.include_router(analytics.router)
 app.include_router(health.router)
 app.include_router(warehouse.router)
+app.include_router(voice_router.router)
+app.include_router(billing.router)
+app.include_router(movement.router)
+
 
 # ---------------------------------------------------------
 # Static Frontend (Optional)

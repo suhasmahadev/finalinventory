@@ -1,12 +1,11 @@
-# backend/services/movement_service.py
-
 from sqlalchemy.ext.asyncio import AsyncSession
-from uuid import UUID, uuid4
 from typing import Optional
 from datetime import date
+import random
 
 from repos.inventory_repo import InventoryRepo
 from repos.stock_movement_repo import StockMovementRepo
+from repos.warehouse_repo import WarehouseRepo
 from models.schema import MovementType
 
 
@@ -15,6 +14,7 @@ class MovementService:
     def __init__(self):
         self.inventory_repo = InventoryRepo()
         self.movement_repo = StockMovementRepo()
+        self.warehouse_repo = WarehouseRepo()
 
     # ---------------------------------------------------
     # MANUAL ADJUSTMENT (INCREASE OR DECREASE)
@@ -22,7 +22,7 @@ class MovementService:
     async def adjust_stock(
         self,
         db: AsyncSession,
-        batch_id: UUID,
+        batch_id: int,
         adjustment_quantity: float,
         reason: str,
         created_by: Optional[str],
@@ -42,34 +42,42 @@ class MovementService:
             if new_quantity < 0:
                 raise ValueError("Adjustment would result in negative stock")
 
+            # Update available quantity
             await self.inventory_repo.update_batch_quantity(
                 db=db,
                 batch_id=batch.id,
                 new_quantity=new_quantity,
             )
 
-            movement_type = (
-                MovementType.IN if adjustment_quantity > 0 else MovementType.ADJUSTMENT
-            )
+            # Optional: if positive adjustment, also increase total
+            if adjustment_quantity > 0:
+                await self.inventory_repo.update_batch_total_quantity(
+                    db=db,
+                    batch_id=batch.id,
+                    additional_quantity=adjustment_quantity,
+                )
+
+            tx_id = f"TX-{random.randint(100000, 999999)}"
 
             await self.movement_repo.create_movement(
                 db=db,
                 item_id=batch.item_id,
                 batch_id=batch.id,
                 quantity=abs(adjustment_quantity),
-                movement_type=movement_type,
+                movement_type=MovementType.ADJUSTMENT,
                 warehouse_id=batch.warehouse_id,
                 room_id=batch.room_id,
                 reference_type="ADJUSTMENT",
                 reference_id=reason,
                 created_by=created_by,
-                tx_id=uuid4(),
+                tx_id=tx_id,
             )
 
             return {
                 "status": "adjusted",
-                "batch_id": str(batch.id),
+                "batch_id": batch.id,
                 "new_quantity": float(new_quantity),
+                "transaction_id": tx_id,
             }
 
     # ---------------------------------------------------
@@ -78,8 +86,8 @@ class MovementService:
     async def transfer_stock(
         self,
         db: AsyncSession,
-        batch_id: UUID,
-        target_room_id: UUID,
+        batch_id: int,
+        target_room_id: int,
         quantity: float,
         created_by: Optional[str],
     ):
@@ -96,7 +104,18 @@ class MovementService:
             if float(batch.quantity_available) < quantity:
                 raise ValueError("Insufficient stock for transfer")
 
-            # Deduct from source
+            # Validate target room
+            target_room = await self.warehouse_repo.get_room_by_id(db, target_room_id)
+            if not target_room:
+                raise ValueError("Target room not found")
+
+            # Ensure same warehouse
+            if batch.room_id:
+                source_room = await self.warehouse_repo.get_room_by_id(db, batch.room_id)
+                if source_room and source_room.warehouse_id != target_room.warehouse_id:
+                    raise ValueError("Cross-warehouse transfer not allowed")
+
+            # Deduct from source batch
             new_quantity = float(batch.quantity_available) - quantity
 
             await self.inventory_repo.update_batch_quantity(
@@ -117,7 +136,7 @@ class MovementService:
                 purchase_price=batch.purchase_price,
             )
 
-            tx_id = uuid4()
+            tx_id = f"TX-{random.randint(100000, 999999)}"
 
             # Ledger OUT
             await self.movement_repo.create_movement(
@@ -129,6 +148,7 @@ class MovementService:
                 warehouse_id=batch.warehouse_id,
                 room_id=batch.room_id,
                 reference_type="TRANSFER_OUT",
+                reference_id=str(target_room_id),
                 created_by=created_by,
                 tx_id=tx_id,
             )
@@ -143,11 +163,12 @@ class MovementService:
                 warehouse_id=batch.warehouse_id,
                 room_id=target_room_id,
                 reference_type="TRANSFER_IN",
+                reference_id=str(batch.room_id),
                 created_by=created_by,
                 tx_id=tx_id,
             )
 
             return {
                 "status": "transferred",
-                "transaction_id": str(tx_id),
+                "transaction_id": tx_id,
             }

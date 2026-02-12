@@ -9,7 +9,10 @@ const Sidebar = () => {
         { path: '/', label: 'Dashboard', icon: '📊' },
         { path: '/inventory', label: 'Inventory', icon: '📦' },
         { path: '/warehouses', label: 'Warehouses', icon: '🏭' },
+        { path: '/billing', label: 'Billing', icon: '💰' },
+        { path: '/movement', label: 'Movement', icon: '🔄' },
         { path: '/analytics', label: 'Analytics', icon: '📈' },
+        { path: '/voice', label: 'Voice', icon: '🎤' },
         { path: '/agent', label: 'AI Agent', icon: '🤖' },
     ];
 

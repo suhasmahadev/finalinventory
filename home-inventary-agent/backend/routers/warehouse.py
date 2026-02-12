@@ -2,105 +2,159 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from uuid import UUID
 from pydantic import BaseModel
+from typing import Optional
 
 from dependencies import get_db
-from models.schema import Warehouse, Room
+from services.warehouse_service import WarehouseService
 
 router = APIRouter(prefix="/warehouse", tags=["Warehouse"])
 
+warehouse_service = WarehouseService()
 
-# ----------------------------
-# Request Models
-# ----------------------------
+
+# =========================================================
+# REQUEST MODELS
+# =========================================================
 
 class WarehouseCreate(BaseModel):
     name: str
-    address: str | None = None
+    address: Optional[str] = None
 
 
 class RoomCreate(BaseModel):
-    warehouse_id: UUID
+    warehouse_id: int
     name: str
-    floor_no: int | None = None
+    floor_no: Optional[int] = None
 
 
-# ----------------------------
-# Create Warehouse
-# ----------------------------
-
+# =========================================================
+# CREATE WAREHOUSE
+# =========================================================
 @router.post("/")
 async def create_warehouse(
     payload: WarehouseCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
-    warehouse = Warehouse(
-        name=payload.name,
-        address=payload.address
-    )
-
-    db.add(warehouse)
-    await db.commit()
-    await db.refresh(warehouse)
-
-    return {
-        "id": warehouse.id,
-        "name": warehouse.name,
-        "address": warehouse.address
-    }
+    try:
+        return await warehouse_service.create_warehouse(
+            db=db,
+            name=payload.name,
+            address=payload.address,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
-# ----------------------------
-# Create Room
-# ----------------------------
+# =========================================================
+# DELETE WAREHOUSE (SAFE)
+# =========================================================
+@router.delete("/{warehouse_id}")
+async def delete_warehouse(
+    warehouse_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await warehouse_service.delete_warehouse(
+            db=db,
+            warehouse_id=warehouse_id,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
+
+# =========================================================
+# GET SINGLE WAREHOUSE
+# =========================================================
+@router.get("/{warehouse_id}")
+async def get_warehouse(
+    warehouse_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await warehouse_service.get_warehouse_dashboard(
+            db=db,
+            warehouse_id=warehouse_id,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+# =========================================================
+# LIST ALL WAREHOUSES
+# =========================================================
+@router.get("/list")
+async def list_warehouses(
+    db: AsyncSession = Depends(get_db),
+):
+    return await warehouse_service.list_warehouses(db)
+
+
+# =========================================================
+# CREATE ROOM
+# =========================================================
 @router.post("/room")
 async def create_room(
     payload: RoomCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
-    # Check warehouse exists
-    warehouse = await db.get(Warehouse, payload.warehouse_id)
-    if not warehouse:
-        raise HTTPException(status_code=404, detail="Warehouse not found")
+    try:
+        return await warehouse_service.create_room(
+            db=db,
+            warehouse_id=payload.warehouse_id,
+            name=payload.name,
+            floor_no=payload.floor_no,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
-    room = Room(
-        warehouse_id=payload.warehouse_id,
-        name=payload.name,
-        floor_no=payload.floor_no
-    )
 
-    db.add(room)
-    await db.commit()
-    await db.refresh(room)
-
-    return {
-        "id": room.id,
-        "warehouse_id": room.warehouse_id,
-        "name": room.name,
-        "floor_no": room.floor_no
-    }
-
-# ----------------------------
-# List Warehouses
-# ----------------------------
-
-@router.get("/list")
-async def list_warehouses(
-    db: AsyncSession = Depends(get_db)
+# =========================================================
+# DELETE ROOM (SAFE DELETE)
+# =========================================================
+@router.delete("/room/{room_id}")
+async def delete_room(
+    room_id: int,
+    db: AsyncSession = Depends(get_db),
 ):
-    from sqlalchemy import select
-    result = await db.execute(select(Warehouse))
-    warehouses = result.scalars().all()
-    
-    return {
-        "count": len(warehouses),
-        "data": [
-            {
-                "id": w.id,
-                "name": w.name,
-                "address": w.address
-            } for w in warehouses
-        ]
-    }
+    try:
+        return await warehouse_service.delete_room(
+            db=db,
+            room_id=room_id,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# =========================================================
+# GET ROOM DETAILS
+# =========================================================
+@router.get("/room/{room_id}")
+async def get_room(
+    room_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await warehouse_service.get_room_details(
+            db=db,
+            room_id=room_id,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+# =========================================================
+# WAREHOUSE DASHBOARD (DETAILED VIEW)
+# =========================================================
+@router.get("/dashboard/{warehouse_id}")
+async def get_warehouse_dashboard(
+    warehouse_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        return await warehouse_service.get_warehouse_dashboard(
+            db=db,
+            warehouse_id=warehouse_id,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

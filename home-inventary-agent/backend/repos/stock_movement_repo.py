@@ -3,7 +3,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.schema import StockMovement, MovementType
-from uuid import UUID, uuid4
 from typing import Optional, List
 from datetime import datetime
 
@@ -16,20 +15,19 @@ class StockMovementRepo:
     async def create_movement(
         self,
         db: AsyncSession,
-        item_id: UUID,
+        item_id: int,
         quantity: float,
         movement_type: MovementType,
-        batch_id: Optional[UUID] = None,
-        warehouse_id: Optional[UUID] = None,
-        room_id: Optional[UUID] = None,
+        batch_id: Optional[int] = None,
+        warehouse_id: Optional[int] = None,
+        room_id: Optional[int] = None,
         reference_type: Optional[str] = None,
         reference_id: Optional[str] = None,
         created_by: Optional[str] = None,
-        tx_id: Optional[UUID] = None,
+        tx_id: Optional[str] = None,
     ) -> StockMovement:
 
         movement = StockMovement(
-            id=uuid4(),
             item_id=item_id,
             batch_id=batch_id,
             warehouse_id=warehouse_id,
@@ -39,7 +37,7 @@ class StockMovementRepo:
             reference_type=reference_type,
             reference_id=reference_id,
             created_by=created_by,
-            tx_id=tx_id or uuid4(),
+            tx_id=tx_id,
         )
 
         db.add(movement)
@@ -52,7 +50,7 @@ class StockMovementRepo:
     async def get_movements_by_item(
         self,
         db: AsyncSession,
-        item_id: UUID
+        item_id: int
     ) -> List[StockMovement]:
 
         result = await db.execute(

@@ -8,14 +8,17 @@ const Inventory = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [newItem, setNewItem] = useState({ name: '', sku: '', unit: 'pcs', reorder_threshold: 10 });
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const fetchItems = async () => {
         try {
             setLoading(true);
-            const data = await inventoryApi.getInventoryItems();
+            setError(null);
+            const data = await inventoryApi.getItems();
             setItems(data);
         } catch (error) {
             console.error("Failed to fetch inventory", error);
+            setError(error.message || "Failed to load inventory");
         } finally {
             setLoading(false);
         }
@@ -32,16 +35,20 @@ const Inventory = () => {
             setNewItem({ name: '', sku: '', unit: 'pcs', reorder_threshold: 10 });
             fetchItems();
         } catch (err) {
-            alert("Failed to create item");
+            alert(err.message || "Failed to create item");
         }
     };
 
     const columns = [
         { key: 'name', label: 'Name' },
         { key: 'sku', label: 'SKU' },
-        { key: 'category', label: 'Category' },
-        { key: 'total_stock', label: 'Total Stock' }, // Assuming this field exists or needs join
+        { key: 'total_stock', label: 'Total Stock' },
         { key: 'unit', label: 'Unit' },
+        { 
+            key: 'reorder_threshold', 
+            label: 'Reorder Level',
+            render: (val) => val ?? 'N/A'
+        },
     ];
 
     return (
@@ -53,13 +60,23 @@ const Inventory = () => {
                 </button>
             </div>
 
-            <DataTable
-                columns={columns}
-                data={items}
-                actions={(row) => (
-                    <button className="btn btn-secondary text-sm">View Details</button>
-                )}
-            />
+            {error && (
+                <div style={{ padding: '1rem', background: 'var(--danger-color)', borderRadius: '4px' }}>
+                    {error}
+                </div>
+            )}
+
+            {loading ? (
+                <div style={{ textAlign: 'center', padding: '2rem' }}>Loading inventory...</div>
+            ) : (
+                <DataTable
+                    columns={columns}
+                    data={items}
+                    actions={(row) => (
+                        <button className="btn btn-secondary text-sm">View Details</button>
+                    )}
+                />
+            )}
 
             <Modal
                 isOpen={isCreateModalOpen}

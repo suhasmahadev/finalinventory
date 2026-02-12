@@ -10,12 +10,28 @@ from google.cloud import texttospeech
 class VoiceService:
 
     def __init__(self):
-        self.speech_client = speech.SpeechClient()
-        self.tts_client = texttospeech.TextToSpeechClient()
+        # DO NOT initialize clients here
+        self._speech_client = None
+        self._tts_client = None
+
+    # ----------------------------------------
+    # Lazy client loaders
+    # ----------------------------------------
+
+    def _get_speech_client(self):
+        if not self._speech_client:
+            self._speech_client = speech.SpeechClient()
+        return self._speech_client
+
+    def _get_tts_client(self):
+        if not self._tts_client:
+            self._tts_client = texttospeech.TextToSpeechClient()
+        return self._tts_client
 
     # ---------------------------------------------------
     # SPEECH TO TEXT
     # ---------------------------------------------------
+
     async def speech_to_text(
         self,
         audio_base64: str,
@@ -24,6 +40,8 @@ class VoiceService:
     ) -> Dict:
 
         try:
+            speech_client = self._get_speech_client()
+
             audio_bytes = base64.b64decode(audio_base64)
 
             audio = speech.RecognitionAudio(content=audio_bytes)
@@ -34,9 +52,8 @@ class VoiceService:
                 language_code=language,
             )
 
-            # Run blocking SDK call in thread
             response = await asyncio.to_thread(
-                self.speech_client.recognize,
+                speech_client.recognize,
                 config,
                 audio
             )
@@ -63,6 +80,7 @@ class VoiceService:
     # ---------------------------------------------------
     # TEXT TO SPEECH
     # ---------------------------------------------------
+
     async def text_to_speech(
         self,
         text: str,
@@ -70,6 +88,8 @@ class VoiceService:
     ) -> Dict:
 
         try:
+            tts_client = self._get_tts_client()
+
             synthesis_input = texttospeech.SynthesisInput(text=text)
 
             voice = texttospeech.VoiceSelectionParams(
@@ -81,9 +101,8 @@ class VoiceService:
                 audio_encoding=texttospeech.AudioEncoding.MP3
             )
 
-            # Run blocking SDK call in thread
             response = await asyncio.to_thread(
-                self.tts_client.synthesize_speech,
+                tts_client.synthesize_speech,
                 input=synthesis_input,
                 voice=voice,
                 audio_config=audio_config

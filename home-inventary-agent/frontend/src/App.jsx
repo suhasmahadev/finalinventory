@@ -6,6 +6,9 @@ import Inventory from './pages/Inventory';
 import Warehouses from './pages/Warehouses';
 import Analytics from './pages/Analytics';
 import Agent from './pages/Agent';
+import Billing from './pages/Billing';
+import Movement from './pages/Movement';
+import Voice from './pages/Voice';
 import './index.css';
 
 function App() {
@@ -20,6 +23,9 @@ function App() {
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/warehouses" element={<Warehouses />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/billing" element={<Billing />} />
+            <Route path="/movement" element={<Movement />} />
+            <Route path="/voice" element={<Voice />} />
             <Route path="/agent" element={<Agent />} />
           </Routes>
         </main>
