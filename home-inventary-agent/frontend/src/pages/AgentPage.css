@@ -1,0 +1,221 @@
+.agent-page-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.agent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.agent-header h1 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.session-info {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.voice-status {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+}
+
+.voice-status.listening {
+    color: #27ae60;
+    background-color: #d4edda;
+    font-weight: 600;
+}
+
+.agent-description {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #3498db;
+}
+
+.agent-description p {
+    margin: 0 0 0.5rem 0;
+    color: #555;
+}
+
+.agent-description ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.5rem;
+}
+
+.agent-description li {
+    margin: 0.5rem 0;
+    color: #666;
+}
+
+.input-container {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-form {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.voice-btn {
+    font-size: 1.5rem;
+    padding: 0.75rem 1rem;
+    min-width: 60px;
+}
+
+.message-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.message-input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.message-input:disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.agent-tips {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.agent-tips h4 {
+    margin: 0 0 1rem 0;
+    color: #555;
+}
+
+.tip-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.tip-btn {
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.tip-btn:hover {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #2980b9;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #7f8c8d;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background-color: #c0392b;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .agent-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .input-form {
+        flex-wrap: wrap;
+    }
+
+    .voice-btn {
+        order: 1;
+    }
+
+    .message-input {
+        order: 2;
+        width: 100%;
+    }
+
+    .btn-primary {
+        order: 3;
+        width: 100%;
+    }
+
+    .tip-buttons {
+        flex-direction: column;
+    }
+
+    .tip-btn {
+        width: 100%;
+    }
+}

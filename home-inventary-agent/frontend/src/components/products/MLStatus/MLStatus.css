@@ -1,0 +1,113 @@
+.ml-status-container {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.ml-status-container h1 {
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.status-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+}
+
+.status-header h2 {
+    margin: 0;
+    color: #555;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.status-ready {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-not-ready {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.model-info {
+    margin-bottom: 2rem;
+}
+
+.model-info h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.info-item label {
+    font-weight: 600;
+    color: #777;
+    font-size: 0.85rem;
+}
+
+.info-item span {
+    color: #333;
+    word-break: break-word;
+}
+
+.status-description {
+    background-color: #e8f4f8;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.status-description h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #555;
+}
+
+.status-description p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.status-description ul {
+    margin: 1rem 0 0 0;
+    padding-left: 1.5rem;
+}
+
+.status-description li {
+    color: #666;
+    margin: 0.5rem 0;
+}

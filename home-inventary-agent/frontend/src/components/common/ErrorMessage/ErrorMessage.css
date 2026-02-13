@@ -1,0 +1,66 @@
+.error-message {
+    background-color: #fee;
+    border: 1px solid #fcc;
+    border-left: 4px solid #e74c3c;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.error-content {
+    display: flex;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.error-icon {
+    font-size: 1.5rem;
+}
+
+.error-text {
+    flex: 1;
+    color: #c0392b;
+}
+
+.error-text strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.validation-errors {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #fcc;
+}
+
+.validation-errors ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.5rem;
+}
+
+.validation-errors li {
+    margin: 0.25rem 0;
+}
+
+.error-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #c0392b;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.error-close:hover {
+    background-color: #fcc;
+}

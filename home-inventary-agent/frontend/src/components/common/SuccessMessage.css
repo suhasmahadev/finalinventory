@@ -1,0 +1,25 @@
+.success-message {
+    background-color: #efe;
+    border: 1px solid #cfc;
+    border-radius: 4px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.success-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.success-header h4 {
+    margin: 0;
+    color: #3c3;
+    font-size: 1rem;
+}
+
+.success-text {
+    margin: 0;
+    color: #3c3;
+}

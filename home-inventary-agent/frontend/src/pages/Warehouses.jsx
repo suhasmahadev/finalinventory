@@ -1,0 +1,125 @@
+import { useEffect, useState } from 'react';
+import * as warehouseApi from '../api/warehouseApi';
+import DataTable from '../components/DataTable';
+import Modal from '../components/Modal';
+
+const Warehouses = () => {
+    const [warehouses, setWarehouses] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [newWarehouse, setNewWarehouse] = useState({ name: '', address: '' });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const fetchWarehouses = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await warehouseApi.getWarehouses();
+            setWarehouses(data);
+        } catch (e) {
+            console.error(e);
+            setError(e.message || "Failed to load warehouses");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchWarehouses();
+    }, []);
+
+    const handleCreate = async () => {
+        try {
+            if (!newWarehouse.name) {
+                alert("Warehouse name is required");
+                return;
+            }
+            await warehouseApi.createWarehouse(newWarehouse);
+            setModalOpen(false);
+            setNewWarehouse({ name: '', address: '' });
+            fetchWarehouses();
+        } catch (err) {
+            console.error("Create warehouse error:", err);
+            alert(err.response?.data?.detail || err.message || "Failed to create warehouse");
+        }
+    };
+
+    const handleDelete = async (warehouseId, warehouseName) => {
+        if (!confirm(`Are you sure you want to delete warehouse "${warehouseName}"?`)) {
+            return;
+        }
+
+        try {
+            await warehouseApi.deleteWarehouse(warehouseId);
+            fetchWarehouses();
+        } catch (err) {
+            console.error("Delete warehouse error:", err);
+            alert(err.response?.data?.detail || err.message || "Failed to delete warehouse");
+        }
+    };
+
+    const columns = [
+        { key: 'name', label: 'Name' },
+        { key: 'address', label: 'Address', render: (val) => val || 'N/A' },
+        { key: 'id', label: 'ID' },
+    ];
+
+    return (
+        <div className="flex-col gap-4">
+            <div className="flex justify-between items-center">
+                <h1 className="text-lg font-bold">Warehouses</h1>
+                <button className="btn btn-primary" onClick={() => setModalOpen(true)}>
+                    + Add Warehouse
+                </button>
+            </div>
+
+            {error && (
+                <div style={{ padding: '1rem', background: 'var(--danger-color)', borderRadius: '4px', color: 'white' }}>
+                    {error}
+                </div>
+            )}
+
+            {loading ? (
+                <div style={{ textAlign: 'center', padding: '2rem' }}>Loading warehouses...</div>
+            ) : (
+                <DataTable
+                    columns={columns}
+                    data={warehouses}
+                    actions={(row) => (
+                        <button
+                            className="btn btn-secondary text-sm"
+                            onClick={() => handleDelete(row.id, row.name)}
+                            style={{ background: '#dc3545', color: 'white' }}
+                        >
+                            Delete
+                        </button>
+                    )}
+                />
+            )}
+
+            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Add Warehouse">
+                <div className="flex flex-col gap-4">
+                    <input
+                        className="input"
+                        placeholder="Warehouse Name *"
+                        value={newWarehouse.name}
+                        onChange={e => setNewWarehouse({ ...newWarehouse, name: e.target.value })}
+                        required
+                    />
+                    <input
+                        className="input"
+                        placeholder="Address (optional)"
+                        value={newWarehouse.address}
+                        onChange={e => setNewWarehouse({ ...newWarehouse, address: e.target.value })}
+                    />
+                    <div className="flex justify-end gap-2 mt-4">
+                        <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>Cancel</button>
+                        <button className="btn btn-primary" onClick={handleCreate}>Save</button>
+                    </div>
+                </div>
+            </Modal>
+        </div>
+    );
+};
+
+export default Warehouses;

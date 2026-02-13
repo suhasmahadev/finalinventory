@@ -1,0 +1,53 @@
+.error-message {
+    background-color: #fee;
+    border: 1px solid #fcc;
+    border-radius: 4px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.error-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.error-header h4 {
+    margin: 0;
+    color: #c33;
+    font-size: 1rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #c33;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #a22;
+}
+
+.validation-list {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.validation-list li {
+    margin: 0.5rem 0;
+    color: #c33;
+}
+
+.validation-list strong {
+    color: #a22;
+}
+
+.error-text {
+    margin: 0;
+    color: #c33;
+}
