@@ -1,31 +1,47 @@
 import React from 'react';
-import './DataTable.css';
+
 
 const DataTable = ({ data, columns, onRowClick }) => {
     if (!data || data.length === 0) {
-        return <div className="no-data">No data available</div>;
+        return (
+            <div className="p-8 text-center text-brown-400 italic bg-white/50 rounded-xl border border-beige-200">
+                No data available
+            </div>
+        );
     }
 
     return (
-        <div className="data-table-container">
-            <table className="data-table">
-                <thead>
+        <div className="overflow-x-auto rounded-xl border border-beige-200 shadow-sm">
+            <table className="w-full border-collapse bg-white text-left">
+                <thead className="bg-beige-50">
                     <tr>
-                        {columns.map((col) => (
-                            <th key={col.key}>{col.label}</th>
+                        {columns.map((column) => (
+                            <th
+                                key={column.key}
+                                className="p-4 text-xs font-semibold uppercase tracking-wider text-brown-500 border-b border-beige-200"
+                            >
+                                {column.label}
+                            </th>
                         ))}
                     </tr>
                 </thead>
-                <tbody>
-                    {data.map((row, index) => (
+                <tbody className="divide-y divide-beige-100">
+                    {data.map((row, rowIndex) => (
                         <tr
-                            key={row.id || index}
+                            key={rowIndex}
                             onClick={() => onRowClick && onRowClick(row)}
-                            className={onRowClick ? 'clickable' : ''}
+                            className={`
+                                transition-colors duration-150
+                                ${onRowClick
+                                    ? 'cursor-pointer hover:bg-beige-50'
+                                    : ''}
+                            `}
                         >
-                            {columns.map((col) => (
-                                <td key={col.key}>
-                                    {col.render ? col.render(row[col.key], row) : row[col.key]}
+                            {columns.map((column) => (
+                                <td key={column.key} className="p-4 text-sm text-brown-700 whitespace-nowrap">
+                                    {column.render
+                                        ? column.render(row[column.key], row)
+                                        : row[column.key]}
                                 </td>
                             ))}
                         </tr>
