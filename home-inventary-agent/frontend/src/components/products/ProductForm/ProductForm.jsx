@@ -3,7 +3,6 @@ import { productsApi, categoriesApi } from '../../../services/api';
 import ErrorMessage from '../../common/ErrorMessage';
 import SuccessMessage from '../../common/SuccessMessage';
 import LoadingSpinner from '../../common/LoadingSpinner';
-import './ProductForm.css';
 
 const ProductForm = ({ productId, onSuccess, onCancel }) => {
     const [formData, setFormData] = useState({
@@ -146,164 +145,194 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     }
 
     return (
-        <div className="product-form-container">
-            <h2>{isEditMode ? 'Edit Product' : 'Create New Product'}</h2>
+        <div className="max-w-3xl mx-auto">
+            <div className="glass-panel p-8 rounded-xl shadow-lg border border-beige-200">
+                <h2 className="text-2xl font-bold text-brown-900 mb-6 border-b border-beige-200 pb-4">
+                    {isEditMode ? 'Edit Product' : 'Create New Product'}
+                </h2>
 
-            <ErrorMessage error={error} onClose={() => setError(null)} />
-            <SuccessMessage message={success} onClose={() => setSuccess(null)} />
+                <ErrorMessage error={error} onClose={() => setError(null)} />
+                <SuccessMessage message={success} onClose={() => setSuccess(null)} />
 
-            <form onSubmit={handleSubmit} className="product-form">
-                <div className="form-group">
-                    <label htmlFor="name">
-                        Product Name <span className="required">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        maxLength={512}
-                        placeholder="Enter product name"
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="sku">SKU</label>
-                    <input
-                        type="text"
-                        id="sku"
-                        name="sku"
-                        value={formData.sku}
-                        onChange={handleChange}
-                        maxLength={128}
-                        placeholder="Stock Keeping Unit"
-                    />
-                </div>
-
-                <div className="form-row">
-                    <div className="form-group">
-                        <label htmlFor="price">
-                            Price <span className="required">*</span>
-                        </label>
-                        <input
-                            type="number"
-                            id="price"
-                            name="price"
-                            value={formData.price}
-                            onChange={handleChange}
-                            required
-                            min="0"
-                            step="0.01"
-                            placeholder="0.00"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="category_id">
-                            Category <span className="required">*</span>
-                        </label>
-                        <select
-                            id="category_id"
-                            name="category_id"
-                            value={formData.category_id}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Select a category</option>
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                <div className="form-row">
-                    <div className="form-group">
-                        <label htmlFor="unit">Unit</label>
-                        <input
-                            type="text"
-                            id="unit"
-                            name="unit"
-                            value={formData.unit}
-                            onChange={handleChange}
-                            maxLength={32}
-                            placeholder="e.g., kg, pcs, liters"
-                        />
-                    </div>
-
-                    <div className="form-group checkbox-group">
-                        <label htmlFor="in_stock">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-4">
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-semibold text-brown-700 mb-1">
+                                Product Name <span className="text-red-500">*</span>
+                            </label>
                             <input
-                                type="checkbox"
-                                id="in_stock"
-                                name="in_stock"
-                                checked={formData.in_stock}
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={formData.name}
                                 onChange={handleChange}
+                                required
+                                maxLength={512}
+                                placeholder="Enter product name"
+                                className="w-full px-4 py-2 rounded-lg bg-white/50 border border-beige-300 focus:ring-2 focus:ring-brown-400 focus:border-brown-400 outline-none transition-all text-brown-800 placeholder-brown-400"
                             />
-                            In Stock
-                        </label>
-                    </div>
-                </div>
+                        </div>
 
-                <div className="form-row">
-                    <div className="form-group">
-                        <label htmlFor="reorder_threshold">Reorder Threshold</label>
-                        <input
-                            type="number"
-                            id="reorder_threshold"
-                            name="reorder_threshold"
-                            value={formData.reorder_threshold}
-                            onChange={handleChange}
-                            min="0"
-                            step="0.01"
-                            placeholder="Minimum stock level"
-                        />
+                        <div>
+                            <label htmlFor="sku" className="block text-sm font-semibold text-brown-700 mb-1">
+                                SKU
+                            </label>
+                            <input
+                                type="text"
+                                id="sku"
+                                name="sku"
+                                value={formData.sku}
+                                onChange={handleChange}
+                                maxLength={128}
+                                placeholder="Stock Keeping Unit"
+                                className="w-full px-4 py-2 rounded-lg bg-white/50 border border-beige-300 focus:ring-2 focus:ring-brown-400 focus:border-brown-400 outline-none transition-all text-brown-800 placeholder-brown-400"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="price" className="block text-sm font-semibold text-brown-700 mb-1">
+                                    Price <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2 text-brown-400">$</span>
+                                    <input
+                                        type="number"
+                                        id="price"
+                                        name="price"
+                                        value={formData.price}
+                                        onChange={handleChange}
+                                        required
+                                        min="0"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        className="w-full pl-8 pr-4 py-2 rounded-lg bg-white/50 border border-beige-300 focus:ring-2 focus:ring-brown-400 focus:border-brown-400 outline-none transition-all text-brown-800 placeholder-brown-400"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="category_id" className="block text-sm font-semibold text-brown-700 mb-1">
+                                    Category <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="category_id"
+                                    name="category_id"
+                                    value={formData.category_id}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-2 rounded-lg bg-white/50 border border-beige-300 focus:ring-2 focus:ring-brown-400 focus:border-brown-400 outline-none transition-all text-brown-800"
+                                >
+                                    <option value="">Select a category</option>
+                                    {categories.map((category) => (
+                                        <option key={category.id} value={category.id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="unit" className="block text-sm font-semibold text-brown-700 mb-1">
+                                    Unit
+                                </label>
+                                <input
+                                    type="text"
+                                    id="unit"
+                                    name="unit"
+                                    value={formData.unit}
+                                    onChange={handleChange}
+                                    maxLength={32}
+                                    placeholder="e.g., kg, pcs, liters"
+                                    className="w-full px-4 py-2 rounded-lg bg-white/50 border border-beige-300 focus:ring-2 focus:ring-brown-400 focus:border-brown-400 outline-none transition-all text-brown-800 placeholder-brown-400"
+                                />
+                            </div>
+
+                            <div className="flex items-center pt-7">
+                                <label className="flex items-center gap-2 cursor-pointer select-none text-brown-700 font-medium">
+                                    <input
+                                        type="checkbox"
+                                        id="in_stock"
+                                        name="in_stock"
+                                        checked={formData.in_stock}
+                                        onChange={handleChange}
+                                        className="w-5 h-5 text-brown-600 rounded border-beige-300 focus:ring-brown-500"
+                                    />
+                                    In Stock
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="reorder_threshold" className="block text-sm font-semibold text-brown-700 mb-1">
+                                    Reorder Threshold
+                                </label>
+                                <input
+                                    type="number"
+                                    id="reorder_threshold"
+                                    name="reorder_threshold"
+                                    value={formData.reorder_threshold}
+                                    onChange={handleChange}
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="Minimum stock level"
+                                    className="w-full px-4 py-2 rounded-lg bg-white/50 border border-beige-300 focus:ring-2 focus:ring-brown-400 focus:border-brown-400 outline-none transition-all text-brown-800 placeholder-brown-400"
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="lead_time_days" className="block text-sm font-semibold text-brown-700 mb-1">
+                                    Lead Time (Days)
+                                </label>
+                                <input
+                                    type="number"
+                                    id="lead_time_days"
+                                    name="lead_time_days"
+                                    value={formData.lead_time_days}
+                                    onChange={handleChange}
+                                    min="0"
+                                    placeholder="Days to restock"
+                                    className="w-full px-4 py-2 rounded-lg bg-white/50 border border-beige-300 focus:ring-2 focus:ring-brown-400 focus:border-brown-400 outline-none transition-all text-brown-800 placeholder-brown-400"
+                                />
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="lead_time_days">Lead Time (Days)</label>
-                        <input
-                            type="number"
-                            id="lead_time_days"
-                            name="lead_time_days"
-                            value={formData.lead_time_days}
-                            onChange={handleChange}
-                            min="0"
-                            placeholder="Days to restock"
-                        />
-                    </div>
-                </div>
-
-                <div className="form-actions">
-                    <button type="submit" className="btn btn-primary" disabled={loading}>
-                        {loading ? 'Saving...' : isEditMode ? 'Update Product' : 'Create Product'}
-                    </button>
-                    {onCancel && (
+                    <div className="flex gap-4 mt-8 pt-6 border-t border-beige-200">
                         <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={onCancel}
+                            type="submit"
+                            className="flex-1 px-6 py-2.5 bg-brown-600 hover:bg-brown-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={loading}
                         >
-                            Cancel
+                            {loading ? 'Saving...' : isEditMode ? 'Update Product' : 'Create Product'}
                         </button>
-                    )}
-                </div>
-            </form>
+                        {onCancel && (
+                            <button
+                                type="button"
+                                className="px-6 py-2.5 bg-beige-200 hover:bg-beige-300 text-brown-800 font-semibold rounded-lg transition-colors disabled:opacity-50"
+                                onClick={onCancel}
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
+                        )}
+                    </div>
+                </form>
 
-            {!isEditMode && (
-                <div className="info-box">
-                    <p>
-                        <strong>Note:</strong> When you create a product, the ML model will
-                        automatically predict sales based on the product details. The
-                        prediction will be displayed in the product list.
-                    </p>
-                </div>
-            )}
+                {!isEditMode && (
+                    <div className="mt-6 p-4 bg-brown-50 rounded-lg border border-brown-100 text-sm text-brown-700 flex gap-3">
+                        <div className="text-xl">💡</div>
+                        <p>
+                            <strong>Note:</strong> When you create a product, the ML model will
+                            automatically predict sales based on the product details. The
+                            prediction will be displayed in the product list.
+                        </p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

@@ -4,7 +4,7 @@ import { categoriesApi } from '../../../services/api';
 import DataTable from '../../common/DataTable/DataTable';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
-import './CategoryList.css';
+
 
 const CategoryList = () => {
     const navigate = useNavigate();
@@ -47,17 +47,25 @@ const CategoryList = () => {
     }
 
     return (
-        <div className="category-list-container">
-            <div className="list-header">
-                <h1>Categories</h1>
-                <button className="btn btn-primary" onClick={() => navigate('/categories/create')}>
-                    + Create New Category
+        <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-brown-900 mb-2">Categories</h1>
+                    <p className="text-brown-500">Manage your product categories and organization.</p>
+                </div>
+                <button
+                    className="flex items-center gap-2 px-4 py-2 bg-brown-600 hover:bg-brown-700 text-white rounded-lg shadow-lg shadow-brown-600/20 transition-all duration-200"
+                    onClick={() => navigate('/categories/create')}
+                >
+                    <span className="text-lg font-bold">+</span> Create New Category
                 </button>
             </div>
 
             <ErrorMessage error={error} onClose={() => setError(null)} />
 
-            <DataTable data={categories} columns={columns} onRowClick={handleRowClick} />
+            <div className="glass-panel rounded-xl overflow-hidden backdrop-blur-sm">
+                <DataTable data={categories} columns={columns} onRowClick={handleRowClick} />
+            </div>
         </div>
     );
 };
